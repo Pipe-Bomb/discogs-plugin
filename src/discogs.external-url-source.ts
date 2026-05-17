@@ -1,4 +1,5 @@
 import {
+	AlbumExternalUrlHelper,
 	ArtistExternalUrlHelper,
 	ExternalUrl,
 	ExternalUrlSource,
@@ -22,6 +23,10 @@ export class DiscogsExternalUrlSource implements ExternalUrlSource {
 	}
 
 	getTrackUrls(helper: TrackExternalUrlHelper): ExternalUrl[] | null {
+		return null;
+	}
+
+	getAlbumUrls(helper: AlbumExternalUrlHelper): ExternalUrl[] | null {
 		return null;
 	}
 }

@@ -1,4 +1,6 @@
 import {
+	AlbumAttributes,
+	AlbumInformationHelper,
 	ArtistInformationHelper,
 	AttributeSource,
 	AttributeSourceApiContext,
@@ -118,5 +120,14 @@ export class DiscogsAttributeSource implements AttributeSource {
 		}
 
 		return attributes;
+	}
+
+	async getAlbumAttributeValues(
+		helper: AlbumInformationHelper,
+	): Promise<AlbumAttributes> {
+		return {
+			album: null,
+			artists: null,
+		};
 	}
 }
