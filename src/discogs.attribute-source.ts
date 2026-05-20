@@ -90,7 +90,7 @@ export class DiscogsAttributeSource implements AttributeSource {
 				attributes.push({
 					key: "thumb",
 					value: {
-						data,
+						buffer: data,
 						extension: path.extname(thumbnail.resource_url).substring(1),
 					},
 				});
@@ -110,7 +110,7 @@ export class DiscogsAttributeSource implements AttributeSource {
 				attributes.push({
 					key: "background",
 					value: {
-						data,
+						buffer: data,
 						extension: path.extname(background.resource_url).substring(1),
 					},
 				});
