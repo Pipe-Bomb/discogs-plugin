@@ -14,7 +14,7 @@ export class DiscogsExternalUrlSource implements ExternalUrlSource {
 				{
 					iconId: "discogs_logo",
 					name: "Discogs",
-					url: `https://discogs.com/artist/${discogsId.value}`,
+					url: `https://discogs.com/artist/${discogsId.identity}`,
 				},
 			];
 		}

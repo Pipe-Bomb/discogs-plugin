@@ -1,13 +1,14 @@
 import {
-	AlbumAttributes,
 	AlbumInformationHelper,
+	AlbumMetadata,
 	ArtistInformationHelper,
+	ArtistMetadata,
 	AttributeSource,
 	AttributeSourceApiContext,
 	AttributeValue,
 	Logger,
-	TrackAttributes,
 	TrackAttributionHelper,
+	TrackMetadata,
 } from "@sdk";
 import Discogs from "disconnect";
 import Axios from "axios";
@@ -51,25 +52,27 @@ export class DiscogsAttributeSource implements AttributeSource {
 
 	async getTrackAttributeValues(
 		_helper: TrackAttributionHelper,
-	): Promise<TrackAttributes> {
+	): Promise<TrackMetadata> {
 		return {
-			track: null,
+			attributes: null,
 			artists: null,
 		};
 	}
 
 	async getArtistAttributeValues(
 		helper: ArtistInformationHelper,
-	): Promise<AttributeValue[]> {
+	): Promise<ArtistMetadata> {
 		const identity = helper.getIdentity("discogs_artist_id");
 
 		if (!identity) {
-			return [];
+			return {
+				attributes: null,
+			};
 		}
 
 		const attributes: AttributeValue[] = [];
 
-		const numberId = Number(identity.value);
+		const numberId = Number(identity.identity);
 		if (Number.isInteger(numberId) && numberId > 0) {
 			const artist = await this.client.database().getArtist(numberId);
 
@@ -119,14 +122,14 @@ export class DiscogsAttributeSource implements AttributeSource {
 			// todo: use artist.urls
 		}
 
-		return attributes;
+		return { attributes };
 	}
 
 	async getAlbumAttributeValues(
-		helper: AlbumInformationHelper,
-	): Promise<AlbumAttributes> {
+		_helper: AlbumInformationHelper,
+	): Promise<AlbumMetadata> {
 		return {
-			album: null,
+			attributes: null,
 			artists: null,
 		};
 	}
