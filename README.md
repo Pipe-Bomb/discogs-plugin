@@ -3,7 +3,7 @@
     Discogs Plugin
 </h1>
 
-Retrives artist attributes from [Discogs](https://www.discogs.com). This plugin doesn't implement any identities, and requires another plugin to assign the "`discogs_artist_id`" to artists before it will retrieve attributes for them. Initially designed to be used alongside the official [MusicBrainz plugin](https://github.com/pipe-bomb/musicbrainz-plugin), which correctly implements this identity.
+Retrives artist attributes from [Discogs](https://www.discogs.com). This plugin doesn't implement any identities, and requires another plugin to assign the "`discogs_artist_id`" identity to artists before it will retrieve attributes for them. Initially designed to be used alongside the official [MusicBrainz plugin](https://github.com/pipe-bomb/musicbrainz-plugin), which correctly implements this identity.
 
 ## Installation
 
