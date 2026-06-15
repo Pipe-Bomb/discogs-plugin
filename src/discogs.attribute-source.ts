@@ -10,22 +10,21 @@ import {
 	TrackAttributionHelper,
 	TrackMetadata,
 } from "@sdk";
-import Discogs from "disconnect";
 import Axios from "axios";
 import path from "path";
 import { USER_AGENT } from "./constants.js";
+import { DiscogsCache } from "./discogs-cache.js";
 
 export class DiscogsAttributeSource implements AttributeSource {
 	public readonly id = "discogs";
 	private api!: AttributeSourceApiContext;
 	private logger!: Logger;
-	private client!: Discogs.Client;
+
+	constructor(private readonly cache: DiscogsCache) {}
 
 	enable(context: AttributeSourceApiContext): void {
 		this.api = context;
 		this.logger = context.getLogger();
-
-		this.client = new Discogs.Client();
 
 		this.api.registerArtistAttributes([
 			{
@@ -72,54 +71,48 @@ export class DiscogsAttributeSource implements AttributeSource {
 
 		const attributes: AttributeValue[] = [];
 
-		const numberId = Number(identity.identity);
-		if (Number.isInteger(numberId) && numberId > 0) {
-			const artist = await this.client.database().getArtist(numberId);
+		const artist = await this.cache.getArtist(identity.identity);
+		attributes.push({
+			key: "name",
+			value: artist.name.replace(/\s\(\d+\)$/, ""), // remove (2) suffix
+		});
 
-			attributes.push({
-				key: "name",
-				value: artist.name.replace(/\s\(\d+\)$/, ""), // remove (2) suffix
+		const thumbnail = artist.images?.find((image) => image.type == "primary");
+		if (thumbnail) {
+			const { data } = await Axios.get<Buffer>(thumbnail.resource_url, {
+				responseType: "arraybuffer",
+				headers: {
+					"User-Agent": USER_AGENT,
+				},
 			});
 
-			const thumbnail = artist.images?.find((image) => image.type == "primary");
-			if (thumbnail) {
-				const { data } = await Axios.get<Buffer>(thumbnail.resource_url, {
-					responseType: "arraybuffer",
-					headers: {
-						"User-Agent": USER_AGENT,
-					},
-				});
+			attributes.push({
+				key: "thumb",
+				value: {
+					buffer: data,
+					extension: path.extname(thumbnail.resource_url).substring(1),
+				},
+			});
+		}
 
-				attributes.push({
-					key: "thumb",
-					value: {
-						buffer: data,
-						extension: path.extname(thumbnail.resource_url).substring(1),
-					},
-				});
-			}
+		const background = artist.images?.find(
+			(image) => image.type == "secondary",
+		);
+		if (background) {
+			const { data } = await Axios.get<Buffer>(background.resource_url, {
+				responseType: "arraybuffer",
+				headers: {
+					"User-Agent": USER_AGENT,
+				},
+			});
 
-			const background = artist.images?.find(
-				(image) => image.type == "secondary",
-			);
-			if (background) {
-				const { data } = await Axios.get<Buffer>(background.resource_url, {
-					responseType: "arraybuffer",
-					headers: {
-						"User-Agent": USER_AGENT,
-					},
-				});
-
-				attributes.push({
-					key: "background",
-					value: {
-						buffer: data,
-						extension: path.extname(background.resource_url).substring(1),
-					},
-				});
-			}
-
-			// todo: use artist.urls
+			attributes.push({
+				key: "background",
+				value: {
+					buffer: data,
+					extension: path.extname(background.resource_url).substring(1),
+				},
+			});
 		}
 
 		return { attributes };
